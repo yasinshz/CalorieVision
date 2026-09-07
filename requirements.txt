@@ -1,0 +1,8 @@
+streamlit>=1.36,<2.0
+transformers>=4.42,<5.0
+torch>=2.2
+Pillow>=10.3
+requests>=2.32
+pandas>=2.2
+safetensors>=0.4
+python-dotenv>=1.0
