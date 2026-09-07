@@ -1,254 +1,527 @@
-# دفترچه هوشمند تغذیه — نسخه 12 (Hybrid Iranian Recognition)
+🥗 CalorieVision
 
-این پروژه نسخه ارتقایافته MVP تشخیص غذا و تخمین کالری است. کاربر می‌تواند حساب محلی بسازد، وعده‌های روزانه را ثبت کند و گزارش هفتگی مصرف کالری را ببیند.
+AI-powered food recognition and calorie tracking with special support for Persian foods.
 
-## قابلیت‌ها
+NutriVision is a multi-user nutrition journal that combines Food-101 and CLIP in a route-aware hybrid pipeline to recognize food images, estimate calorie intake, and track daily and weekly nutrition history.
 
-- ثبت‌نام با ایمیل اجباری و تأیید واقعی ایمیل با کد ۶ رقمی، ورود و خروج کاربران
-- ذخیره رمز عبور به‌صورت هش‌شده با PBKDF2 و salt اختصاصی
-- تعیین و ویرایش هدف کالری روزانه
-- تغییر نام کاربری، ایمیل اجباری و رمز عبور از داخل پروفایل
-- فراموشی رمز با کد یک‌بارمصرف ۶ رقمی و اعتبار ۱۵ دقیقه‌ای
-- ارسال واقعی کد تأیید ثبت‌نام و کد بازیابی رمز با Gmail SMTP
-- تشخیص Hybrid غذا با `nateraw/food` (Food-101) و `openai/clip-vit-base-patch32` با تمرکز ویژه بر غذاهای ایرانی
-- انتخاب دستی چند جزء برای هر وعده
-- دریافت کالری مرجع از USDA FoodData Central
-- ثبت صبحانه، میان‌وعده صبح، ناهار، عصرانه، شام و میان‌وعده شب
-- دسته مستقل «خوراکی / شیرینی» برای مصرف‌های بین وعده
-- ثبت تاریخ و ساعت دقیق مصرف
-- ثبت سریع غذا یا نوشیدنی با کالری کل یا کالری مرجع در ۱۰۰ گرم/۱۰۰ میلی‌لیتر
-- ذخیره هر وعده و اجزای آن زیر حساب همان کاربر
-- داشبورد مصرف امروز و کالری باقی‌مانده
-- تاریخچه بازه‌ای همراه با ساعت، جزئیات و حذف وعده
-- گزارش هفتگی شامل مجموع، میانگین، روند روزانه، سهم وعده‌ها و غذاهای پرتکرار
-- جداسازی کامل داده‌های کاربران در SQLite
-- ورود وزن غذا با دقت یک گرم و حجم نوشیدنی با دقت یک میلی‌لیتر
-- گزارش هفتگی بر مبنای شنبه تا جمعه
-- رابط کاربری واکنش‌گرا برای موبایل، تبلت و دسکتاپ
-- رابط آبی–مشکی با هدر، ناوبری و کارت‌های آماری سفارشی و مستقل از Sidebar پیش‌فرض Streamlit
-- منوی موبایل به‌صورت دکمه Hamburger با باز/بسته‌شدن عمودی
-- کلید تغییر حالت Dark / Light با نگهداری انتخاب در Session
+✨ Features
 
-## تغییرات نسخه 9
+🤖 Hybrid food recognition using Food-101 + CLIP
 
-- آیکون تغییر تم به داخل Navbar منتقل شده و در گوشه بالای سمت راست قرار می‌گیرد.
-- در حالت روشن آیکون `☀️` و در حالت تاریک آیکون `🌙` نمایش داده می‌شود.
-- تم روشن با پالت آبی روشن، سایه‌های چندلایه، Borderهای واضح‌تر و کارت‌های برجسته‌تر بازطراحی شده است.
-- فیلدهای متنی، مخصوصاً «نام خوراکی» و جست‌وجوی غذا، در Light Mode رنگ متن و Placeholder مستقل دارند تا متن تایپ‌شده کاملاً خوانا باشد.
-- در عرض موبایل، نوار ناوبری اصلی پنهان است و با دکمه `☰ منو` باز می‌شود؛ منوی بازشده عمودی است و پس از انتخاب صفحه خودکار بسته می‌شود.
-- انتخاب تم در `st.session_state` نگه داشته می‌شود؛ بنابراین با جابه‌جایی بین صفحات از بین نمی‌رود.
-- Sidebar داخلی Streamlit همچنان کاملاً حذف است.
-- قابلیت‌های نسخه‌های قبل شامل جست‌وجوی غذا/نوشیدنی، ثبت دقیق مقدار مصرف و هفته شنبه تا جمعه حفظ شده‌اند.
+🇮🇷 Special support for Persian foods
 
+🧠 Zero-shot classification for foods outside Food-101 classes
 
-## تغییرات نسخه 11
+🎯 Route-aware decision logic to protect confident Food-101 predictions
 
-- هنگام ساخت حساب، کاربر تا قبل از واردکردن کد ایمیل نمی‌تواند وارد حساب شود.
-- کد تأیید ثبت‌نام ۶ رقمی، یک‌بارمصرف، دارای اعتبار ۱۵ دقیقه و سقف ۵ تلاش اشتباه است.
-- امکان «ارسال مجدد کد تأیید» برای حساب‌های تأییدنشده اضافه شده است.
-- فراموشی رمز همچنان کد جداگانه و واقعی به ایمیل حساب ارسال می‌کند.
-- SMTP برای Gmail از قبل روی `smtp.gmail.com:587` و STARTTLS تنظیم شده است.
-- آدرس فرستنده در `.env` و `.env.example` از قبل تنظیم شده و فقط `SMTP_PASSWORD` باید با **Google App Password** تکمیل شود.
-- رمز عادی Gmail داخل پروژه ذخیره نمی‌شود و نباید در `SMTP_PASSWORD` قرار گیرد.
-- حساب‌های ساخته‌شده با نسخه‌های قدیمی هنگام مهاجرت دیتابیس به‌عنوان تأییدشده حفظ می‌شوند تا قفل نشوند.
+🔍 Fine-grained recognition for visually similar Persian dishes
 
+🍽️ Support for multi-item meals
 
-## تشخیص Hybrid اصلی — Route-aware + Iranian Fine-Grained
+⚖️ Food quantity in grams
 
-در نسخه 12، Hybrid به موتور اصلی تشخیص تبدیل شده است. Food-101 ابتدا غذای عمومی و خانواده ظاهری را بررسی می‌کند. برای خانواده‌های واضح مثل پاستا، برگر، ساندویچ، پیتزا و سوشی، CLIP فقط داخل همان خانواده Refinement انجام می‌دهد و غذاهای ایرانی اجازه Override ندارند. فقط در تصاویر مبهم یا غذاهایی که Food-101 پوشش مناسبی ندارد، CLIP به‌عنوان متخصص غذاهای ایرانی فعال می‌شود. علاوه بر این، برای خورش‌های ایرانی بسیار شبیه یک مرحله دوم Fine-Grained اضافه شده که روی نشانه‌های بصری متمایز مانند ساقه کرفس، آلو، لوبیا، بادمجان و بامیه تمرکز می‌کند. جزئیات در `HYBRID_MODEL.md` آمده است.
+🥤 Drink quantity in milliliters
 
-## ساختار داده
+🔥 Calorie estimation based on USDA FoodData Central
 
-```text
-User
-└── Meals
-    └── Meal Items
-```
+🗂️ Internal calorie fallback for selected Persian dishes
 
-جداول اصلی:
+👤 Multi-user accounts with isolated user data
 
-- `users`: حساب‌ها و هدف کالری روزانه
-- `meals`: اطلاعات کلی هر وعده
-- `meal_items`: اجزای هر وعده، وزن و کالری
-- `nutrition_cache`: کش داده‌های USDA
-- `analyses`: جدول قدیمی نسخه MVP که برای جلوگیری از حذف داده‌های قبلی حفظ شده است
+✉️ Email verification with a 6-digit one-time code
 
-## پیش‌نیازها
+🔐 Password reset via email
 
-- Python 3.10 یا 3.11
-- اینترنت در اولین اجرای مدل و برای درخواست‌های USDA
-- حدود ۱ تا ۲ گیگابایت فضای آزاد برای محیط و مدل
+📊 Daily dashboard and weekly reports
 
-## نصب
+📅 Weekly reporting based on Saturday → Friday
 
-در پوشه پروژه:
+📱 Responsive UI for desktop, tablet, and mobile
 
-```bash
+🌙 Light / Dark mode
+
+✅ Automated tests for core application logic
+
+🧠 How It Works
+
+Food Image
+   │
+   ▼
+Image Preprocessing
+   │
+   ▼
+Food-101 Classifier
+   │
+   ├── Confident known food family
+   │      │
+   │      ▼
+   │   Protected / family-aware refinement
+   │
+   └── Ambiguous or unsupported food
+          │
+          ▼
+       CLIP Zero-Shot
+          │
+          ▼
+   Persian Food Recognition
+          │
+          ▼
+ Fine-Grained Comparison
+          │
+          ▼
+ User Confirmation / Correction
+          │
+          ▼
+ USDA / Internal Nutrition Data
+          │
+          ▼
+ Quantity Entry
+          │
+          ▼
+ Calorie Calculation
+          │
+          ▼
+ SQLite Storage + Dashboard
+
+🔬 Hybrid Recognition
+
+NutriVision does not simply average the outputs of two models.
+
+Food-101
+
+The pretrained nateraw/food model is used as the primary classifier for common food categories such as:
+
+Pizza
+
+Burger
+
+Pasta
+
+Sushi
+
+Sandwiches
+
+Desserts
+
+Other Food-101 classes
+
+CLIP
+
+openai/clip-vit-base-patch32 is used as a zero-shot image classifier to extend recognition beyond the fixed Food-101 class set.
+
+This is especially useful for Persian dishes such as:
+
+Ghormeh Sabzi
+
+Gheimeh
+
+Fesenjan
+
+Khoresh Karafs
+
+Zereshk Polo
+
+Baghali Polo
+
+Koobideh
+
+Joojeh Kebab
+
+Ash Reshteh
+
+Mirza Ghasemi
+
+Kashk-e Bademjan
+
+and more
+
+Route-Aware Decision
+
+For visually distinctive Food-101 families such as pizza, burger, pasta, sandwich, and sushi, the system protects a confident Food-101 result from unrelated CLIP overrides.
+
+When the main classifier is ambiguous or the food is likely outside the Food-101 class set, the Persian-food CLIP route becomes more influential.
+
+Fine-Grained Persian Food Recognition
+
+Some Persian dishes can look very similar. NutriVision performs an additional restricted comparison for selected groups using more descriptive prompts.
+
+Examples include:
+
+Khoresh Karafs vs. Aloo Esfenaj
+
+Gheimeh vs. Gheimeh Bademjan
+
+Khoresh Bademjan vs. Khoresh Bamieh
+
+The prompts focus on visible cues such as celery stalks, eggplant, okra, split peas, beans, plums, fish, or chicken.
+
+🔥 Calorie Estimation
+
+For general foods, NutriVision can retrieve reference nutrition data from USDA FoodData Central.
+
+The calorie estimate is calculated as:
+
+Calories = (Consumed Amount × Reference Calories) / 100
+
+Example:
+
+Reference: 150 kcal / 100 g
+Consumed:  200 g
+
+Estimated calories = 300 kcal
+
+For selected Persian mixed dishes without a reliable direct USDA match, an editable internal kcal/100g estimate is used.
+
+Calorie values are estimates and can vary depending on ingredients, cooking method, oil, serving size, and recipe.
+
+🥤 Food & Drink Measurement
+
+NutriVision uses different measurement units depending on the item type:
+
+Item Type
+
+Quantity Unit
+
+Reference Basis
+
+Solid food
+
+grams (g)
+
+kcal / 100 g
+
+Drinks
+
+milliliters (ml)
+
+kcal / 100 ml
+
+Common drinks such as water, tea, coffee, soda, juice, milk, doogh, and Persian syrups are handled as volume-based items.
+
+🛠️ Tech Stack
+
+Technology
+
+Purpose
+
+Python
+
+Main application language
+
+Streamlit
+
+Web UI
+
+PyTorch
+
+Deep learning runtime
+
+Hugging Face Transformers
+
+Model loading and inference
+
+Food-101
+
+Primary food classifier
+
+CLIP
+
+Zero-shot image-text matching
+
+Pillow
+
+Image preprocessing
+
+SQLite
+
+User, meal, and nutrition data
+
+USDA FoodData Central
+
+Nutrition data
+
+SMTP
+
+Email verification and password reset
+
+Pytest
+
+Automated testing
+
+📁 Project Structure
+
+NutriVision/
+├── app.py
+├── auth.py
+├── database.py
+├── mailer.py
+├── calendar_utils.py
+├── requirements.txt
+├── pyproject.toml
+├── README.md
+├── HYBRID_MODEL.md
+│
+├── services/
+│   ├── classifier.py
+│   ├── hybrid_classifier.py
+│   ├── food_catalog.py
+│   ├── labels_fa.py
+│   ├── measurements.py
+│   └── usda.py
+│
+├── tests/
+│   └── ...
+│
+├── data/
+│   └── ...
+│
+└── .streamlit/
+    └── config.toml
+
+🚀 Installation
+
+Requirements
+
+Python 3.10 or 3.11
+
+Internet connection for the first model download
+
+Internet connection for USDA and email features
+
+Around 1–2 GB of free disk space for dependencies and model files
+
+1. Clone the repository
+
+git clone https://github.com/YOUR_USERNAME/NutriVision.git
+cd NutriVision
+
+2. Create a virtual environment
+
+Windows
+
 python -m venv .venv
-```
-
-### Windows
-
-```powershell
 .venv\Scripts\activate
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
 
-### Linux و macOS
+Linux / macOS
 
-```bash
+python -m venv .venv
 source .venv/bin/activate
+
+3. Install dependencies
+
 python -m pip install --upgrade pip
 pip install -r requirements.txt
-```
 
-## تنظیم متغیرهای محیطی
+🔑 Environment Variables
 
-فایل `.env.example` را به `.env` تغییر نام دهید. برای USDA:
+Create a .env file based on .env.example.
 
-```env
 USDA_API_KEY=YOUR_DATA_GOV_API_KEY
-```
 
-در صورت تنظیم‌نکردن کلید، برنامه از `DEMO_KEY` استفاده می‌کند که محدودیت درخواست بیشتری دارد.
-
-برای ارسال واقعی ایمیل، تنظیم Gmail در پروژه آماده است:
-
-```env
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USERNAME=mohammadyasinshz@gmail.com
-SMTP_PASSWORD=YOUR_GMAIL_APP_PASSWORD
-SMTP_FROM_EMAIL=mohammadyasinshz@gmail.com
+SMTP_USERNAME=YOUR_EMAIL@example.com
+SMTP_PASSWORD=YOUR_APP_PASSWORD
+SMTP_FROM_EMAIL=YOUR_EMAIL@example.com
 SMTP_USE_TLS=true
 SMTP_USE_SSL=false
+
 RESET_CODE_DEBUG=false
 VERIFICATION_CODE_DEBUG=false
-```
 
-فایل `.env` نیز همراه پروژه ایجاد شده و فقط مقدار `SMTP_PASSWORD` آن خالی است. در این متغیر باید **App Password گوگل** قرار گیرد؛ رمز عادی حساب Gmail را داخل پروژه قرار ندهید. برای حالت واقعی هر دو گزینه Debug را `false` نگه دارید.
+Important
 
-## اجرا
+Never commit your real .env file.
 
-```bash
+Never store your personal email password in the project.
+
+Use an app-specific password or provider-recommended credential for SMTP.
+
+Keep API keys and credentials outside the source code.
+
+If no USDA key is configured, the application may fall back to DEMO_KEY, which has stricter request limits.
+
+▶️ Run the App
+
 python -m streamlit run app.py
-```
 
-مرورگر معمولاً به‌صورت خودکار باز می‌شود. آدرس پیش‌فرض معمولاً این است:
+The app normally opens at:
 
-```text
 http://localhost:8501
-```
 
-## روند استفاده
+👤 Typical User Flow
 
-1. با نام کاربری، ایمیل و رمز عبور حساب بسازید؛ کد ۶ رقمی ارسال‌شده به ایمیل را وارد کنید تا حساب فعال شود.
-2. از بخش «ثبت وعده جدید» تصویر غذا را وارد کنید یا مستقیماً غذاها را از فهرست انتخاب کنید.
-3. اطلاعات USDA را دریافت کنید.
-4. مقدار مصرف هر قلم را ثبت کنید: غذاها با گرم (مثلاً ۱۸۲ گرم) و نوشیدنی‌ها با میلی‌لیتر (مثلاً ۲۵۰ میلی‌لیتر)، همراه نوع وعده، تاریخ، ساعت و یادداشت.
-5. برای شیرینی یا خوراکی خارج از فهرست، «ثبت سریع خوراکی دلخواه» را انتخاب کنید.
-6. داشبورد امروز، تاریخچه و گزارش هفتگی را مشاهده کنید.
-7. از «پروفایل و تنظیمات» نام کاربری، ایمیل، رمز و هدف روزانه را تغییر دهید.
-8. در صورت فراموشی رمز، از تب «فراموشی رمز» کد ایمیلی بگیرید و رمز جدید تعیین کنید.
+Create an account.
 
-## ارتقا از نسخه قبلی
+Verify the account using the 6-digit email code.
 
-اگر فایل `data/food_calorie.db` از نسخه قبلی در پوشه پروژه باشد، برنامه در اولین اجرا ساختار جدول وعده‌ها را خودکار ارتقا می‌دهد. وعده‌ها و کاربران قبلی حذف نمی‌شوند و مقدار قدیمی `snack` نیز برای سازگاری حفظ شده است.
+Log in.
 
-## امنیت نسخه فعلی
+Open New Meal.
 
-- رمز عبور خام در دیتابیس ذخیره نمی‌شود.
-- ایمیل برای حساب‌های جدید و تغییرات پروفایل اجباری و یکتا است.
-- کد تأیید ایمیل و کد بازیابی خام در دیتابیس ذخیره نمی‌شوند؛ فقط هش PBKDF2 آن‌ها نگهداری می‌شود.
-- هر دو نوع کد ۱۵ دقیقه اعتبار دارند، یک‌بارمصرف‌اند و پس از ۵ تلاش ناموفق قفل می‌شوند.
-- پاسخ درخواست بازیابی برای ایمیل موجود و ناموجود یکسان است تا وجود حساب افشا نشود.
-- هر رمز با PBKDF2-HMAC-SHA256، salt تصادفی و تعداد iteration بالا هش می‌شود.
-- تمام پرس‌وجوهای وعده‌ها با `user_id` محدود می‌شوند.
-- کلیدهای خارجی SQLite فعال‌اند و حذف وعده، اجزای آن را نیز حذف می‌کند.
+Upload a food image or search manually.
 
-این احراز هویت برای نسخه محلی و MVP مناسب است. برای انتشار عمومی با تعداد کاربر زیاد، مهاجرت به PostgreSQL و یک سرویس احراز هویت مانند Supabase Auth توصیه می‌شود.
+Review the AI prediction.
 
-## اجرای تست‌ها
+Confirm or correct the food.
 
-```bash
+Retrieve nutrition information.
+
+Enter food weight or drink volume.
+
+Add additional meal items if needed.
+
+Save the meal.
+
+Review the daily dashboard, history, or weekly report.
+
+🗄️ Data Model
+
+User
+ └── Meals
+      └── Meal Items
+
+Main SQLite tables:
+
+Table
+
+Purpose
+
+users
+
+Accounts and daily calorie targets
+
+meals
+
+Meal-level information
+
+meal_items
+
+Foods, quantities, units, and calories
+
+nutrition_cache
+
+Cached USDA results
+
+analyses
+
+Legacy MVP compatibility
+
+🔐 Security
+
+The current version includes:
+
+Password hashing with PBKDF2-HMAC-SHA256
+
+Random salt per password
+
+Hashed email-verification and password-reset codes
+
+15-minute OTP expiration
+
+One-time-use verification/reset codes
+
+Lockout after repeated invalid OTP attempts
+
+User-scoped database queries
+
+SQLite foreign keys and cascade deletion
+
+Sensitive credentials stored outside the source code
+
+The current authentication design is suitable for a local or MVP deployment. For a large public deployment, a production database such as PostgreSQL and a dedicated authentication service would be more appropriate.
+
+🧪 Tests
+
+Run the test suite with:
+
 pip install pytest
 pytest -q
-```
 
-تست‌ها این موارد را پوشش می‌دهند:
+Tests cover areas such as:
 
-- ترجمه و نرمال‌سازی برچسب‌های غذا
-- استخراج کالری از پاسخ USDA
-- هش و بررسی رمز عبور
-- ساخت کاربر و وعده
-- جداسازی داده‌های کاربران
-- محاسبات گزارش روزانه و هفتگی
-- حذف آبشاری اجزای وعده
-- دسته‌بندی‌های کامل وعده و ذخیره ساعت
-- تغییر اطلاعات حساب و رمز عبور
-- اجباری‌بودن ایمیل و وضعیت تأیید آن
-- چرخه ساخت، بررسی و مصرف کد تأیید ایمیل
-- هش و اعتبارسنجی کد بازیابی
-- مصرف یک‌باره کد و قفل‌شدن پس از تلاش‌های ناموفق
-- مهاجرت خودکار دیتابیس نسخه قبلی بدون حذف داده
-- محاسبه صحیح بازه شنبه تا جمعه
+Food-label normalization
 
-## محدودیت‌های علمی
+USDA calorie extraction
 
-- مدل فعلی فقط غذای اصلی تصویر را طبقه‌بندی می‌کند و تشخیص شیء چندغذایی انجام نمی‌دهد.
-- وزن غذا از تصویر محاسبه نمی‌شود و باید توسط کاربر وارد شود.
-- داده USDA یک مقدار مرجع است و ممکن است با دستور پخت واقعی تفاوت داشته باشد.
-- گزارش‌ها ابزار پایش هستند و توصیه پزشکی یا رژیم درمانی محسوب نمی‌شوند.
+Password hashing and verification
 
-## تغییرات نسخه 5
+User and meal creation
 
-- تم کامل آبی–مشکی با تنظیم Theme و CSS هماهنگ.
-- جست‌وجوی مستقل غذا/نوشیدنی با نمایش نتایج فارسی و انگلیسی و دکمه «افزودن».
-- جست‌وجو و انتخاب سریع در مسیر «ثبت سریع خوراکی دلخواه» با دریافت کالری USDA.
-- بهبود رفتار Sidebar در موبایل و تبلت؛ منو به‌صورت overlay با عرض کنترل‌شده و گزینه‌های عمودی نمایش داده می‌شود.
-- Sidebar در حالت `auto` اجرا می‌شود تا Streamlit بر اساس عرض صفحه حالت مناسب را انتخاب کند.
+User data isolation
 
+Daily and weekly calculations
 
-## تغییرات v10
-- در حالت Light، کادرهای جست‌وجوی غذا/نوشیدنی با پس‌زمینه سرمه‌ای و متن تایپ‌شده روشن نمایش داده می‌شوند.
-- Placeholder، نشانگر تایپ و انتخاب نتیجه جست‌وجو نیز برای کنتراست بهتر روشن شده‌اند.
+Cascade deletion
 
----
+Email verification
 
-## موتور Hybrid نسخه 12
+Password reset flows
 
-نسخه 12 موتور Hybrid را به‌عنوان مسیر اصلی تشخیص استفاده می‌کند. Food-101 مرجع غذاهای عمومی است و CLIP به‌صورت Route-aware برای اصلاح همان خانواده یا تشخیص غذاهای ایرانی استفاده می‌شود. برای خانواده‌های مشابه ایرانی، مرحله Fine-Grained Prompt Ensemble اجرا می‌شود تا ویژگی‌های بصری متمایز بررسی شوند.
+Database migration
 
-### تفکیک دقیق خورش‌های مشابه
+Saturday-to-Friday weekly reporting
 
-در گروه خورش‌های سبز، مدل دوم به‌طور اختصاصی بین `خورش کرفس`، `آلو اسفناج`، `قورمه‌سبزی`، `مرغ ترش` و `قلیه ماهی` مقایسه می‌کند. Promptهای اختصاصی روی نشانه‌هایی مانند تکه‌های ساقه کرفس، آلوهای بیضی، لوبیا قرمز، ماهی یا مرغ تمرکز دارند. گروه دیگری نیز برای قیمه، قیمه بادمجان، خورش بادمجان و خورش بامیه وجود دارد.
+Hybrid recognition logic
 
-### کالری غذاهای ایرانی
+Persian food catalog behavior
 
-برای غذاهای ترکیبی ایرانی که تطبیق مستقیم و قابل اتکایی در USDA ندارند، مقدار تقریبی داخلی kcal/100g وجود دارد. این مقدار در UI با عنوان «برآورد داخلی» مشخص و قابل ویرایش است.
+Food/drink measurement handling
 
-### نکته اجرای اول
+⚠️ Current Limitations
 
-در اولین اجرای تشخیص Hybrid، علاوه بر مدل Food-101، مدل CLIP نیز از Hugging Face دانلود می‌شود؛ بنابراین اجرای اول از دفعات بعد طولانی‌تر است. هر دو مدل با `st.cache_resource` در حافظه نگهداری می‌شوند.
+The system classifies the main food in the image; it is not a full multi-object food detector.
 
-### تست‌ها
+Food weight is not estimated from the image and must be entered by the user.
 
-تست‌های نسخه 12 علاوه بر تست‌های v11، پوشش می‌دهند:
+USDA values are reference values and may differ from the actual recipe.
 
-- وجود کاتالوگ گسترده ایرانی؛
-- جست‌وجوی فارسی و aliasها؛
-- غذاهای پاستای جدید؛
-- Fusion مدل Food-101 و Zero-Shot؛
-- Fallback کالری برای غذای ایرانی.
+Persian-food internal calorie values are approximate.
 
-## واحد مقدار مصرف غذا و نوشیدنی
+Visually similar foods can still be misclassified.
 
-از نسخه 13، سامانه واحد مقدار مصرف را بر اساس نوع قلم تنظیم می‌کند:
+Hybrid scores are used for ranking and decision logic and should not be interpreted as perfectly calibrated probabilities.
 
-- غذاهای جامد: **گرم (g)** و کالری مرجع در **100 گرم**
-- نوشیدنی‌ها: **میلی‌لیتر (ml)** و کالری مرجع در **100 میلی‌لیتر**
+This project is a nutrition tracking tool, not a medical or clinical diet recommendation system.
 
-در رابط کاربری، اقلامی مانند آب، چای، قهوه، نوشابه، آبمیوه، شیر، دوغ و شربت‌های ایرانی به‌صورت خودکار با واحد میلی‌لیتر نمایش داده می‌شوند. برای سازگاری با دیتابیس نسخه‌های قبلی، مقدار عددی همچنان در ستون legacy با نام `weight_grams` ذخیره می‌شود و ستون جدید `measure_unit` مشخص می‌کند که مقدار ثبت‌شده `g` است یا `ml`؛ داده‌های قدیمی به‌طور خودکار `g` در نظر گرفته می‌شوند.
+🗺️ Future Improvements
 
-نکته فنی: FoodData Central انرژی را معمولاً بر مبنای 100 گرم ارائه می‌کند. برای نوشیدنی‌های رایج، نسخه 13 این مقدار را با چگالی تقریبی نوشیدنی به مبنای 100 میلی‌لیتر تبدیل می‌کند؛ مقدار نهایی همچنان در فرم قابل ویرایش است.
+Possible future directions include:
+
+Training or fine-tuning on a dedicated Persian-food dataset
+
+Larger evaluation benchmark for Persian dishes
+
+Portion-size estimation from images
+
+Multi-food detection in a single plate
+
+Better confidence calibration
+
+PostgreSQL migration for production-scale deployment
+
+Dedicated authentication service
+
+Cloud deployment
+
+Mobile application
+
+Personalized nutrition analytics
+
+📌 About the Project
+
+NutriVision is a computer vision and nutrition-tracking project focused on combining:
+
+Computer Vision
+
+Deep Learning
+
+Zero-Shot Learning
+
+Nutrition Data
+
+Web Application Development
+
+User Data Management
+
+The main technical idea is the controlled hybrid use of Food-101 and CLIP to preserve strong common-food predictions while extending recognition to Persian foods.
